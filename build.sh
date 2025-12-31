@@ -9,7 +9,7 @@ echo "🧹 Cleaning old builds..."
 rm -rf build dist
 
 echo "🛠 Building Mac App with py2app..."
-python3 setup.py py2app
+python setup.py py2app
 
 # Cek apakah build berhasil
 if [ -d "dist/$RAW_APP_NAME" ]; then
