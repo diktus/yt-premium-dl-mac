@@ -13,7 +13,7 @@ OPTIONS = {
         'CFBundleName': "YT Download",
         'CFBundleDisplayName': "YouTube Premium Pro",
         'CFBundleIdentifier': "com.ytpro.downloader",
-        'CFBundleVersion': "1.2.0",
+        'CFBundleVersion': "1.3.0",
         'LSEnvironment': {
             'PYTHONOPTIMIZE': '1',
         },
