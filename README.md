@@ -1,81 +1,98 @@
-📺 YouTube Downloader Pro v1.3.0
-YouTube Downloader Pro is a powerful macOS GUI wrapper for yt-dlp. Built with Python (CustomTkinter), it simplifies the process of downloading high-quality content by managing complex backend binaries, macOS security permissions, and encryption challenges automatically.
+# 📺 YouTube Downloader Pro v1.3.0
 
-Created by: DIKTUS
+<p align="left">
+  <img src="https://img.shields.io/badge/Platform-macOS-000000?style=for-the-badge&logo=apple&logoColor=white" />
+  <img src="https://img.shields.io/badge/Core-yt--dlp-FF0000?style=for-the-badge&logo=youtube&logoColor=white" />
+  <img src="https://img.shields.io/badge/GUI-CustomTkinter-blue?style=for-the-badge" />
+</p>
 
-🛠️ Core Engine: yt-dlp
-This application uses yt-dlp as its primary engine. While yt-dlp is typically a command-line tool, this project provides a native macOS experience by:
+**YouTube Downloader Pro** is a high-performance macOS GUI wrapper for **[yt-dlp](https://github.com/yt-dlp/yt-dlp)**. Developed with Python and CustomTkinter, it provides a native desktop experience for the world's most powerful command-line media downloader.
 
-Managing Binaries: Bundling compatible versions of yt-dlp, FFmpeg, and Node.js.
+> **Created by: DIKTUS**
 
-Security Automation: Automatically handling macOS Gatekeeper and code-signing requirements.
+---
 
-Visual Interface: Providing a user-friendly way to use advanced yt-dlp arguments (cookies, format sorting, and EJS solvers).
+## 🛠️ Core Engine: yt-dlp
+This application serves as a specialized interface for **yt-dlp**. While the core engine handles the complex scraping and downloading, this GUI project manages the "macOS overhead," including:
 
-✨ Key Features
-🚀 Full yt-dlp Power: Supports resolutions from 1080p, 2K, up to 4K via yt-dlp's format sorting.
+* **Binary Management**: Internal bundling of compatible `yt-dlp`, `FFmpeg`, and `Node.js`.
+* **Security Automation**: Built-in **Ad-hoc Signing** and Gatekeeper bypass to ensure binaries run without macOS security errors.
+* **JS Runtime Integration**: Automatic linking to Node.js to solve YouTube's *n-challenge* (throttling) encryption.
 
-🎵 Audio Extraction: High-bitrate MP3 conversion powered by FFmpeg.
+---
 
-🍪 Premium & Browser Integration: Seamlessly pass cookies from Safari, Chrome, Firefox, Edge, Brave, and more to yt-dlp for Premium/Member-only content.
+## ✨ Key Features
+- 🚀 **Full yt-dlp Power**: Download resolutions from 1080p, 2K, up to 4K using advanced format sorting.
+- 🎵 **Premium Audio**: Extract high-bitrate MP3s directly from YouTube Music.
+- 🍪 **Multi-Browser Cookies**: Support for **Safari, Chrome, Firefox, Edge, Brave, Opera, and Vivaldi**.
+- 📊 **Enhanced Visuals**: Real-time progress bar and speed indicators.
+- 📂 **Custom Destination**: Interactive directory selection for your downloads.
+- 🛡️ **Health Check**: Automatically verifies and compares binary versions on startup.
 
-📦 Zero Dependency for Users: Standalone .app bundle with internal Node.js to solve YouTube's n-challenge encryption.
+---
 
-📊 Visual Feedback: Progress bar and speed indicator parsed directly from yt-dlp output.
+## ⚠️ IMPORTANT: macOS Permissions (Action Required)
 
-🛠️ Diagnostic Check: Built-in health check to ensure yt-dlp and its helper binaries are functional.
+To allow the app to interact with system browsers and execute bundled binaries, you **MUST** configure these settings:
 
-⚠️ IMPORTANT: macOS Security Settings (Required)
-Because the app interacts with system-level browser data to provide Premium features, you MUST follow these steps:
+### 1. Grant Full Disk Access
+Required for `yt-dlp` to read your browser cookies for Premium access.
+1.  Open **System Settings** > **Privacy & Security** > **Full Disk Access**.
+2.  Click the **[+]** icon and add `YT_Pro_Mac.app`.
+3.  Toggle the switch to **ON**.
 
-1. Grant Full Disk Access
-
-Required for yt-dlp to read browser cookies securely.
-
-Go to System Settings > Privacy & Security > Full Disk Access.
-
-Click the [+] icon and add YT_Pro_Mac.app.
-
-Ensure the toggle is switched to ON.
-
-2. Bypass Gatekeeper
-
-If the app shows an "unidentified developer" or "damaged" error, run this in your Terminal:
-
-Bash
+### 2. Bypass Gatekeeper
+If you see a "damaged" or "unidentified developer" error, run this command in your Terminal:
+```bash
 xattr -cr /Applications/YT_Pro_Mac.app
-3. Keychain Permissions
+```
+### 3. Keychain Access
+When the app first reads browser cookies, macOS will ask for Keychain permission. Click **"Always Allow"** to enable seamless future downloads.
 
-When yt-dlp first attempts to access browser cookies, macOS will prompt for Keychain access. Click "Always Allow" to prevent being asked every time you download.
+---
 
-🏗️ Build & Development
-Project Structure
+## 🏗️ Development & Build
 
-Plaintext
-YT_Pro_Mac/
-├── app_gui.py       # Main GUI logic
-├── bin/             # Core Binaries (yt-dlp, ffmpeg, ffprobe, node)
-├── Resources/       # UI Icons and images
-└── setup.py         # py2app configuration
-Building the Standalone App
+<details>
+<summary><b>View Project Structure</b></summary>
 
-To package the script into a native .app bundle:
+```text
+.
+├── app_gui.py       # Main GUI Logic & subprocess management
+├── bin/             # Required Binaries (yt-dlp, ffmpeg, ffprobe, node)
+├── setup.py         # py2app configuration
+└── README.md        # Documentation
+```
+</details>
 
-Bash
+### Building the .app Bundle
+To package the script into a standalone macOS application:
+```bash
+# 1. Clean previous builds
 rm -rf build dist
+
+# 2. Build using py2app
 python setup.py py2app
-# Code-sign and clear quarantine
+
+# 3. Clear quarantine flags
 xattr -cr dist/YT_Pro_Mac.app
-🛡️ Binary Health Check
-Upon startup, the GUI verifies the three pillars of the application:
+```
 
-✅ yt-dlp: The core downloader.
+---
 
-✅ Node.js: The JavaScript runtime for solving speed-throttling challenges.
+## 🛡️ Binary Health Check & Version Sync
+The app includes a diagnostic suite that runs at launch to verify the three pillars of the application:
+1.  ✅ **yt-dlp**: The core downloader engine.
+2.  ✅ **Node.js**: The JS runtime for speed-throttling challenges.
+3.  ✅ **FFmpeg**: The post-processor for high-quality muxing.
 
-✅ FFmpeg: The post-processor for high-quality muxing.
+---
 
-📝 Disclaimer
-This tool is a GUI wrapper for yt-dlp. Users are responsible for complying with YouTube's Terms of Service and local copyright laws.
+## 📝 Legal Disclaimer
+This project is a GUI wrapper for `yt-dlp`. It is intended for educational purposes and personal use. Users are responsible for complying with the YouTube Terms of Service and local copyright regulations.
 
-Created by DIKTUS | Powered by yt-dlp
+---
+<p align="center">
+  <b>Created by DIKTUS</b><br>
+  Powered by <a href="https://github.com/yt-dlp/yt-dlp">yt-dlp</a>
+</p>
