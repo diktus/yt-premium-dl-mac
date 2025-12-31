@@ -1,4 +1,5 @@
 dist/
+backup/
 build/
 bin/
 env/
