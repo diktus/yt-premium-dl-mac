@@ -1,14 +1,13 @@
 from setuptools import setup
 
 APP = ['app_gui.py']
-DATA_FILES = [
-    ('bin', ['bin/ffmpeg', 'bin/ffprobe', 'bin/node', 'bin/yt-dlp'])
-]
+DATA_FILES = []
 OPTIONS = {
     'argv_emulation': False,
     'packages': ['customtkinter', 'PIL', 'packaging', 'requests'],
-    'includes': ['tkinter', 'requests'],
-    'excludes': ['PySide6', 'PyQt6', 'PyQt5'],
+    'includes': ['tkinter'],
+    'excludes': ['PySide6', 'PyQt6', 'PyQt5', 'setuptools', 'distutils'],
+    'resources': ['bin'],
     'plist': {
         'CFBundleName': "YT Download",
         'CFBundleDisplayName': "YouTube Premium Pro",

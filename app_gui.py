@@ -88,6 +88,7 @@ class YTProApp(ctk.CTk):
         self.browser_var = ctk.StringVar(value="safari")
         self.browser_menu = ctk.CTkOptionMenu(self.settings_frame, values=["safari", "chrome", "firefox", "edge", "brave", "opera", "vivaldi"], variable=self.browser_var)
         self.browser_menu.grid(row=1, column=1, padx=5, pady=5, sticky="w")
+        ctk.CTkButton(self.settings_frame, text="Update Core", width=80, fg_color="#e67e22", hover_color="#d35400", command=self.update_ytdlp).grid(row=1, column=2, padx=10, pady=5)
 
         # Mode Options
         self.opt_frame = ctk.CTkFrame(self)
@@ -174,6 +175,32 @@ class YTProApp(ctk.CTk):
                 all_pass = False
         if all_pass: self.log("✨ All systems GO!")
 
+    def update_ytdlp(self):
+        self.log("--- Updating yt-dlp ---")
+        url = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp"
+        try:
+            self.log("Downloading latest binary...")
+            response = requests.get(url, stream=True)
+            response.raise_for_status()
+            
+            # Download ke temporary file dulu
+            temp_path = self.ytdlp_path + ".new"
+            with open(temp_path, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    f.write(chunk)
+            
+            # Replace file lama
+            if os.path.exists(self.ytdlp_path):
+                os.remove(self.ytdlp_path)
+            os.rename(temp_path, self.ytdlp_path)
+            
+            # Set permission executable
+            os.chmod(self.ytdlp_path, 0o755)
+            self.log("✅ yt-dlp updated successfully!")
+            self.check_binaries() # Re-check version
+        except Exception as e:
+            self.log(f"❌ Update failed: {e}")
+
     def start_thread(self):
         urls = self.txt_urls.get("1.0", "end-1c").strip().split("\n")
         urls = [u.strip() for u in urls if u.strip()]
@@ -198,10 +225,15 @@ class YTProApp(ctk.CTk):
     def run_download(self, urls):
         dest = self.download_path.get()
         abs_bin_path = os.path.realpath(self.bin_dir)
+        
+        # Fix 1: Buat folder cache terpisah agar tidak bentrok dengan file binary 'yt-dlp'
+        cache_dir = os.path.join(abs_bin_path, "cache")
+        os.makedirs(cache_dir, exist_ok=True)
+
         env_vars = os.environ.copy()
         env_vars.pop("PYTHONHOME", None)
         env_vars.pop("PYTHONPATH", None)
-        env_vars["XDG_CACHE_HOME"] = abs_bin_path 
+        env_vars["XDG_CACHE_HOME"] = cache_dir 
         env_vars["PATH"] = f"{abs_bin_path}{os.pathsep}{env_vars.get('PATH', '')}"
 
         for url in urls:
@@ -237,7 +269,7 @@ class YTProApp(ctk.CTk):
                 
                 proc = subprocess.Popen(
                     cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, 
-                    text=True, env=env_vars, cwd=abs_bin_path, bufsize=1
+                    text=True, encoding="utf-8", env=env_vars, cwd=abs_bin_path, bufsize=1
                 )
                 
                 for line in proc.stdout:
