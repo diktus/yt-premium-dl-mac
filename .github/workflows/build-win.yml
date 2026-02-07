@@ -3,9 +3,13 @@ name: Build Windows Application
 on:
   push:
     branches: [ "main" ]
+    tags: [ "v*" ] # Trigger build & release saat push tag (contoh: v1.3.2)
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
+
+permissions:
+  contents: write # Wajib: Memberi izin bot untuk membuat Release
 
 jobs:
   build-windows:
@@ -24,13 +28,12 @@ jobs:
 
     - name: Install Dependencies
       run: |
-        pip install --upgrade pip
-        pip install customtkinter Pillow requests pyinstaller
+        pip install -r requirements.txt
+        pip install pyinstaller
 
     - name: Download Binaries (Windows)
       shell: pwsh
       run: |
-        # Buat folder bin
         New-Item -ItemType Directory -Force -Path bin
         
         Write-Host "⬇️ Downloading yt-dlp.exe..."
@@ -43,25 +46,33 @@ jobs:
         Invoke-WebRequest -Uri "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip" -OutFile "ffmpeg.zip"
         Expand-Archive -Path "ffmpeg.zip" -DestinationPath "."
         
-        # Cari folder hasil ekstrak (karena namanya berubah-ubah sesuai versi)
         $ffmpegDir = Get-ChildItem -Directory -Filter "ffmpeg-*-essentials_build"
         Move-Item "$($ffmpegDir.FullName)\bin\ffmpeg.exe" "bin\ffmpeg.exe"
         Move-Item "$($ffmpegDir.FullName)\bin\ffprobe.exe" "bin\ffprobe.exe"
         
-        # Bersih-bersih file sampah
         Remove-Item "ffmpeg.zip"
         Remove-Item $ffmpegDir -Recurse -Force
 
     - name: Build .exe with PyInstaller
       shell: pwsh
       run: |
-        # Build Single File Executable (--onefile)
-        # --windowed: Sembunyikan console saat dijalankan
-        # --add-data: Masukkan folder bin ke dalam exe (format windows separator ;)
+        # Build Single File Executable
         pyinstaller --noconfirm --onefile --windowed --name "YTProDownloader" --add-data "bin;bin" app_gui_win.py
 
+    # 1. Upload sebagai Artifact (Selalu dijalankan)
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: YT-Download-Windows
         path: dist/YTProDownloader.exe
+
+    # 2. Upload sebagai Release (Hanya jika ada Tag v*)
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/YTProDownloader.exe
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
