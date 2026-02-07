@@ -3,12 +3,11 @@ name: Build Windows Application
 on:
   push:
     branches: [ "main" ]
-    tags: [ "v*" ] # Trigger saat ada tag baru (contoh: v1.3.1)
+    tags: [ "v*" ]
   workflow_dispatch:
 
-# PENTING: Memberikan izin kepada bot untuk membuat Release
 permissions:
-  contents: write
+  contents: write # Wajib untuk upload Release
 
 jobs:
   build-windows:
@@ -57,20 +56,24 @@ jobs:
       run: |
         pyinstaller --noconfirm --onefile --windowed --name "YTProDownloader" --add-data "bin;bin" app_gui_win.py
 
-    # Upload Artifact (Agar bisa didownload manual di tab Actions jika Release gagal)
+    # Upload Artifact (Cadangan)
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: YT-Download-Windows
         path: dist/YTProDownloader.exe
 
-    # Buat Release hanya jika trigger adalah Tag
-    - name: Create Release
+    # Update Release (Support Tag & Nightly)
+    - name: Update Release
       uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
+      # Jalan jika Tag ATAU jika branch Main
+      if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
       with:
         files: dist/YTProDownloader.exe
+        # Jika Tag: Pakai nama tag (v1.3.1). Jika Main: Pakai "Nightly Build"
+        name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'Nightly Build' }}
+        tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'nightly' }}
+        prerelease: ${{ !startsWith(github.ref, 'refs/tags/') }}
         draft: false
-        prerelease: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
