@@ -51,12 +51,13 @@ class YTProApp(ctk.CTk):
             for tool in tools:
                 src = os.path.join(self.internal_bin, tool)
                 dst = os.path.join(self.bin_dir, tool)
-                if os.path.exists(src):
+                # Fix: Hanya copy jika file tujuan BELUM ada, agar tidak menimpa hasil update user
+                if os.path.exists(src) and not os.path.exists(dst):
                     shutil.copy2(src, dst)
                     subprocess.run(["/usr/bin/xattr", "-cr", dst], stderr=subprocess.DEVNULL)
                     subprocess.run(["/usr/bin/codesign", "--force", "-s", "-", dst], stderr=subprocess.DEVNULL)
                     os.chmod(dst, 0o755) 
-            self.log("System: Mac Binaries verified & re-signed locally.")
+            self.log("System: Mac Binaries verified.")
             self.check_binaries()
         except Exception as e:
             self.log(f"Setup Error: {e}")
@@ -196,6 +197,8 @@ class YTProApp(ctk.CTk):
             
             # Set permission executable
             os.chmod(self.ytdlp_path, 0o755)
+            # Tambahan: Hapus atribut karantina pada file hasil download
+            subprocess.run(["/usr/bin/xattr", "-cr", self.ytdlp_path], stderr=subprocess.DEVNULL)
             self.log("✅ yt-dlp updated successfully!")
             self.check_binaries() # Re-check version
         except Exception as e:
