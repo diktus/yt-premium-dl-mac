@@ -1,4 +1,4 @@
-# 📺 YouTube Downloader Pro v1.3.0
+# 📺 YouTube Downloader Pro v1.3.1
 
 <p align="left">
   <img src="https://img.shields.io/badge/Platform-macOS-000000?style=for-the-badge&logo=apple&logoColor=white" />
@@ -53,7 +53,7 @@ Required for `yt-dlp` to read your browser cookies for Premium access.
 ### 2. Bypass Gatekeeper
 If you see a "damaged" or "unidentified developer" error, run this command in your Terminal:
 ```bash
-xattr -cr /Applications/YT_Pro_Mac.app
+xattr -cr "/Applications/YT Download.app"
 ```
 ### 3. Keychain Access
 When the app first reads browser cookies, macOS will ask for Keychain permission. Click **"Always Allow"** to enable seamless future downloads.

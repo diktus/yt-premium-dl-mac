@@ -27,7 +27,7 @@ class YTProApp(ctk.CTk):
         self.download_path = ctk.StringVar(value=os.path.expanduser("~/Downloads"))
 
         # Inisialisasi UI
-        self.title("YouTube Premium Pro Downloader v1.3.0")
+        self.title("YouTube Premium Pro Downloader v1.3.1")
         self.geometry("900x850")
         ctk.set_appearance_mode("dark")
         self.init_ui()

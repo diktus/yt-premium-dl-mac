@@ -1,12 +1,19 @@
 #!/bin/bash
 
 # --- CONFIGURATION ---
-VERSION="1.3.0"
+VERSION="1.3.1"
 RAW_APP_NAME="YT Download.app"
 ZIP_NAME="YT-Download-v${VERSION}.zip"
 
 echo "🧹 Cleaning old builds..."
 rm -rf build dist
+
+if [ ! -f "icon.icns" ]; then
+    echo "🎨 Generating Icon..."
+    python3 create_icon.py
+else
+    echo "ℹ️  Using existing icon.icns (Skipping generation)"
+fi
 
 echo "🛠 Building Mac App with py2app..."
 python setup.py py2app

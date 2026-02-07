@@ -8,6 +8,7 @@ OPTIONS = {
     'includes': ['tkinter'],
     'excludes': ['PySide6', 'PyQt6', 'PyQt5', 'setuptools', 'distutils'],
     'resources': ['bin'],
+    'iconfile': 'icon.icns',
     'plist': {
         'CFBundleName': "YT Download",
         'CFBundleDisplayName': "YouTube Premium Pro",
