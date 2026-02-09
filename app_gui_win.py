@@ -67,15 +67,17 @@ class YTProApp(ctk.CTk):
         except Exception as e:
             self.log(f"Setup Error: {e}")
 
-    def init_ui(self):
+   def init_ui(self):
+        # Konfigurasi grid utama agar baris ke-6 (Log Area) bersifat fleksibel
         self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(6, weight=1) # Memberikan ruang fleksibel pada log area
 
         ctk.CTkLabel(self, text="YOUTUBE PREMIUM DOWNLOADER", font=("Impact", 35)).grid(row=0, column=0, pady=(20, 10))
         ctk.CTkLabel(self, text="created by diktus", font=("Arial", 15)).grid(row=1, column=0, pady=(0, 20))
         
         # URL Input
-        self.txt_urls = ctk.CTkTextbox(self, height=120)
-        self.txt_urls.grid(row=2, column=0, padx=20, pady=10, sticky="ew")
+        self.txt_urls = ctk.CTkTextbox(self, height=100) # Sedikit dikurangi tingginya agar hemat ruang
+        self.txt_urls.grid(row=2, column=0, padx=20, pady=5, sticky="ew")
         self.txt_urls.insert("1.0", "Masukkan link video/playlist di sini...")
 
         # Settings Frame
@@ -98,17 +100,17 @@ class YTProApp(ctk.CTk):
 
         # Mode Options
         self.opt_frame = ctk.CTkFrame(self)
-        self.opt_frame.grid(row=4, column=0, padx=20, pady=10, sticky="ew")
+        self.opt_frame.grid(row=4, column=0, padx=20, pady=5, sticky="ew")
         self.mode_var = ctk.StringVar(value="video")
-        ctk.CTkRadioButton(self.opt_frame, text="Video (1080p+)", variable=self.mode_var, value="video").pack(side="left", padx=20, pady=10)
-        ctk.CTkRadioButton(self.opt_frame, text="Audio (best/.m4a)", variable=self.mode_var, value="audio_m4a").pack(side="left", padx=20, pady=10)
-        ctk.CTkRadioButton(self.opt_frame, text="Audio (MP3)", variable=self.mode_var, value="audio_mp3").pack(side="left", padx=20, pady=10)
+        ctk.CTkRadioButton(self.opt_frame, text="Video", variable=self.mode_var, value="video").pack(side="left", padx=15, pady=5)
+        ctk.CTkRadioButton(self.opt_frame, text="Audio (m4a)", variable=self.mode_var, value="audio_m4a").pack(side="left", padx=15, pady=5)
+        ctk.CTkRadioButton(self.opt_frame, text="Audio (MP3)", variable=self.mode_var, value="audio_mp3").pack(side="left", padx=15, pady=5)
         self.is_playlist_var = ctk.BooleanVar(value=False)
-        ctk.CTkCheckBox(self.opt_frame, text="Download Playlist", variable=self.is_playlist_var).pack(side="left", padx=20, pady=10)
+        ctk.CTkCheckBox(self.opt_frame, text="Playlist", variable=self.is_playlist_var).pack(side="left", padx=15, pady=5)
 
         # Visual Progress Frame
         self.progress_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.progress_frame.grid(row=5, column=0, padx=20, pady=(10, 0), sticky="ew")
+        self.progress_frame.grid(row=5, column=0, padx=20, pady=(5, 0), sticky="ew")
         
         self.progress_bar = ctk.CTkProgressBar(self.progress_frame, orientation="horizontal")
         self.progress_bar.set(0)
@@ -119,12 +121,13 @@ class YTProApp(ctk.CTk):
         self.lbl_speed = ctk.CTkLabel(self.progress_frame, text="0 MB/s", font=("Arial", 12, "bold"), text_color="cyan")
         self.lbl_speed.pack(side="right")
 
-        # Log area
-        self.log_area = ctk.CTkTextbox(self, height=200, fg_color="black", text_color="#00FF00", font=("Courier New", 12))
+        # Log area (Menggunakan sticky 'nsew' agar mengisi ruang yang tersedia)
+        self.log_area = ctk.CTkTextbox(self, fg_color="black", text_color="#00FF00", font=("Courier New", 12))
         self.log_area.grid(row=6, column=0, padx=20, pady=10, sticky="nsew")
 
-        self.btn_download = ctk.CTkButton(self, text="START DOWNLOAD", command=self.start_thread, height=60, font=("Arial", 18, "bold"), fg_color="#2ecc71", hover_color="#27ae60")
-        self.btn_download.grid(row=7, column=0, padx=20, pady=20, sticky="ew")
+        # Tombol Download (Row 7 akan selalu berada di bawah karena Row 6 mengambil sisa ruang)
+        self.btn_download = ctk.CTkButton(self, text="START DOWNLOAD", command=self.start_thread, height=50, font=("Arial", 18, "bold"), fg_color="#2ecc71", hover_color="#27ae60")
+        self.btn_download.grid(row=7, column=0, padx=20, pady=(10, 20), sticky="ew")
 
     def browse_folder(self):
         folder = filedialog.askdirectory()
