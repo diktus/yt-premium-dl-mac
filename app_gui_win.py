@@ -67,7 +67,7 @@ class YTProApp(ctk.CTk):
         except Exception as e:
             self.log(f"Setup Error: {e}")
 
-   def init_ui(self):
+    def init_ui(self):
         # Konfigurasi grid utama agar baris ke-6 (Log Area) bersifat fleksibel
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(6, weight=1) # Memberikan ruang fleksibel pada log area
