@@ -31,7 +31,7 @@ This application serves as a specialized interface for **yt-dlp**. While the cor
 
 ---
 ## Binary Required 
-- **yt-dlp**: https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp
+- **yt-dlp**: https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos
 - **node**: https://nodejs.org/dist/v24.12.0/node-v24.12.0-darwin-arm64.tar.gz
 - **ffmpeg**: https://www.osxexperts.net/ffmpeg80arm.zip
 - **ffprobe**: https://www.osxexperts.net/ffprobe80arm.zip

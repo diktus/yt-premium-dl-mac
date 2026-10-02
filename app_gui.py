@@ -51,8 +51,20 @@ class YTProApp(ctk.CTk):
             for tool in tools:
                 src = os.path.join(self.internal_bin, tool)
                 dst = os.path.join(self.bin_dir, tool)
-                # Fix: Hanya copy jika file tujuan BELUM ada, agar tidak menimpa hasil update user
-                if os.path.exists(src) and not os.path.exists(dst):
+                should_copy = False
+                if os.path.exists(src):
+                    if not os.path.exists(dst):
+                        should_copy = True
+                    elif tool == "yt-dlp":
+                        # If destination is a python script or invalid binary, overwrite with standalone binary
+                        try:
+                            with open(dst, "rb") as f:
+                                head = f.read(4)
+                            if head.startswith(b"#!"):
+                                should_copy = True
+                        except Exception:
+                            should_copy = True
+                if should_copy:
                     shutil.copy2(src, dst)
                     subprocess.run(["/usr/bin/xattr", "-cr", dst], stderr=subprocess.DEVNULL)
                     subprocess.run(["/usr/bin/codesign", "--force", "-s", "-", dst], stderr=subprocess.DEVNULL)
@@ -143,7 +155,7 @@ class YTProApp(ctk.CTk):
         self.log("--- Running Binary Health Check ---")
         ffmpeg_exe = os.path.join(self.bin_dir, "ffmpeg")
         
-        ytdlp_cmd = [sys.executable, self.ytdlp_path, "--version"]
+        ytdlp_cmd = [self.ytdlp_path, "--version"]
         
         checks = [
             ("Node.js", [self.node_path, "-v"]),
@@ -178,7 +190,7 @@ class YTProApp(ctk.CTk):
 
     def update_ytdlp(self):
         self.log("--- Updating yt-dlp ---")
-        url = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp"
+        url = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos"
         try:
             self.log("Downloading latest binary...")
             response = requests.get(url, stream=True)
@@ -197,8 +209,9 @@ class YTProApp(ctk.CTk):
             
             # Set permission executable
             os.chmod(self.ytdlp_path, 0o755)
-            # Tambahan: Hapus atribut karantina pada file hasil download
+            # Tambahan: Hapus atribut karantina pada file hasil download dan ad-hoc codesign
             subprocess.run(["/usr/bin/xattr", "-cr", self.ytdlp_path], stderr=subprocess.DEVNULL)
+            subprocess.run(["/usr/bin/codesign", "--force", "-s", "-", self.ytdlp_path], stderr=subprocess.DEVNULL)
             self.log("✅ yt-dlp updated successfully!")
             self.check_binaries() # Re-check version
         except Exception as e:
@@ -243,7 +256,6 @@ class YTProApp(ctk.CTk):
             try:
                 self.progress_bar.set(0)
                 cmd = [
-                    sys.executable, "-u",
                     self.ytdlp_path,
                     "--ffmpeg-location", abs_bin_path, 
                     "--cookies-from-browser", self.browser_var.get(),
